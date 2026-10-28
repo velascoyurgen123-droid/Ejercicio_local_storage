@@ -177,6 +177,32 @@ function guardarDatos() {
   const jsonStr = JSON.stringify(data);
   const dataCifrada = encriptar(jsonStr);
   localStorage.setItem("sapfpiDB", dataCifrada);
+  mostrarInformacionAlmacenamiento('guardados');
+}
+
+// Muestra en la consola la información almacenada para facilitar la revisión
+// del funcionamiento de localStorage durante la demostración del proyecto.
+function mostrarInformacionAlmacenamiento(accion = 'cargados') {
+  const registro = localStorage.getItem('sapfpiDB');
+  const datosTema = localStorage.getItem('nexoTema');
+
+  console.group(`[localStorage] Datos ${accion}`);
+  console.info('Clave principal:', 'sapfpiDB');
+  console.info('Existe información:', Boolean(registro));
+  console.info('Tamaño almacenado:', registro ? `${registro.length} caracteres` : '0 caracteres');
+  console.info('Tema guardado:', datosTema || 'claro');
+  console.table({
+    usuarios: usuarios.length,
+    instructores: instructores.length,
+    aprendices: aprendices.length,
+    competencias: competencias.length,
+    asignaciones: instructorCompetencias.length,
+    fichas: fichasTituladas.length,
+    programas: programas.length,
+    ambientes: ambientes.length
+  });
+  console.info('Nota: sapfpiDB está cifrado antes de guardarse en el navegador.');
+  console.groupEnd();
 }
 
 function cargarDatosIniciales() {
@@ -209,6 +235,7 @@ function cargarDatosIniciales() {
         window.location.reload();
         return;
       }
+      mostrarInformacionAlmacenamiento('cargados');
       return;
     } catch (e) {
       console.error("Error al parsear localStorage", e);
@@ -276,6 +303,7 @@ function cargarDatosIniciales() {
       fec_ini_etapa_produc: `2026-0${(index % 8) + 1}-10`, ind_etapa_produc: false
     });
   }
+  guardarDatos();
 }
 
 // -------------------- FUNCIÓN PARA ESCAPAR HTML (XSS) --------------------
@@ -448,7 +476,7 @@ function abrirModalInstructor(instructor = null) {
       <div class="form-group"><label>Apellidos</label><input id="modalApe" value="${apeValue}"></div>
       <div class="form-group"><label>Teléfono</label><input id="modalTel" value="${telValue}"></div>
       <div class="form-group"><label>Correo</label><input id="modalCorreo" type="email" value="${correoValue}"></div>
-      <div class="form-group"><label>Cargo</label><select id="modalCargo">${cargos.map(c => `<option value="${c.id_cargo}" ${isEdit && instructor.id_cargo == c.id_cargo ? 'selected' : ''}>${c.nom_cargo}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Cargo</label><select id="modalCargo"><option value="">Seleccionar</option>${cargos.map(c => `<option value="${c.id_cargo}" ${isEdit && instructor.id_cargo == c.id_cargo ? 'selected' : ''}>${c.nom_cargo}</option>`).join('')}</select></div>
       <div class="form-group"><label><input type="checkbox" id="modalPlanta" ${checkedPlanta}> Instructor de planta</label></div>
       <div class="form-group"><label><input type="checkbox" id="modalLider" ${checkedLider}> Líder de ficha</label></div>
       <div class="flex-buttons"><button class="btn-secondary" id="modalCancel">Cancelar</button><button class="btn-primary" id="modalSave">Guardar</button></div>
@@ -542,6 +570,7 @@ function abrirModalCompetencia(comp = null) {
     <div class="form-group"><label>Nombre</label><input id="compNom" value="${nomValue}"></div>
     <div class="form-group"><label>Tipo</label>
       <select id="compTipo">
+        <option value="">Seleccionar</option>
         <option value="Tn" ${isEdit && comp.ind_tipo_competen == 'Tn' ? 'selected' : ''}>Técnica (Tn)</option>
         <option value="Tr" ${isEdit && comp.ind_tipo_competen == 'Tr' ? 'selected' : ''}>Transversal (Tr)</option>
       </select>
@@ -582,8 +611,8 @@ function abrirModalCompetencia(comp = null) {
 function actualizarSelectsAsignacion() {
   const selectInst = document.getElementById('asignInstrucSelect');
   const selectComp = document.getElementById('asignCompetSelect');
-  if (selectInst) selectInst.innerHTML = instructores.map(i => `<option value="${i.id_instruc}">${i.id_instruc} - ${escapeHTML(i.nom_instruc)} ${escapeHTML(i.apelli_instruc)}</option>`).join('');
-  if (selectComp) selectComp.innerHTML = competencias.map(c => `<option value="${c.id_competen}">${c.id_competen} - ${escapeHTML(c.nom_competen)}</option>`).join('');
+  if (selectInst) selectInst.innerHTML = `<option value="">Seleccionar</option>${instructores.map(i => `<option value="${i.id_instruc}">${escapeHTML(i.nom_instruc)} ${escapeHTML(i.apelli_instruc)}</option>`).join('')}`;
+  if (selectComp) selectComp.innerHTML = `<option value="">Seleccionar</option>${competencias.map(c => `<option value="${c.id_competen}">${escapeHTML(c.nom_competen)}</option>`).join('')}`;
 }
 
 function renderAsignaciones() {
@@ -594,8 +623,8 @@ function renderAsignaciones() {
     const competencia = competencias.find(c => c.id_competen === asig.id_competen);
     if (!instructor || !competencia) return;
     const row = tbody.insertRow();
-    row.insertCell(0).innerText = `${instructor.nom_instruc} ${instructor.apelli_instruc} (ID:${instructor.id_instruc})`;
-    row.insertCell(1).innerText = `${competencia.nom_competen} (ID:${competencia.id_competen})`;
+    row.insertCell(0).innerText = `${instructor.nom_instruc} ${instructor.apelli_instruc}`;
+    row.insertCell(1).innerText = competencia.nom_competen;
     const accel = row.insertCell(2);
     accel.innerHTML = `<button class="icon-btn delete" data-idinst="${asig.id_instruc}" data-idcomp="${asig.id_competen}"><i class="fas fa-trash-alt"></i></button>`;
   });
@@ -612,14 +641,18 @@ function renderAsignaciones() {
 }
 
 document.getElementById('btnAsignar')?.addEventListener('click', () => {
-  const idInst = parseInt(document.getElementById('asignInstrucSelect').value);
-  const idComp = parseInt(document.getElementById('asignCompetSelect').value);
+  const selectInst = document.getElementById('asignInstrucSelect');
+  const selectComp = document.getElementById('asignCompetSelect');
+  const idInst = parseInt(selectInst.value);
+  const idComp = parseInt(selectComp.value);
   if (!idInst || !idComp) return alert("Seleccione ambos campos");
   if (instructorCompetencias.some(a => a.id_instruc === idInst && a.id_competen === idComp))
     return alert("Ya existe esa asignación");
   instructorCompetencias.push({ id_instruc: idInst, id_competen: idComp });
   guardarDatos();
-  renderAll();
+  renderAsignaciones();
+  selectInst.value = '';
+  selectComp.value = '';
 });
 
 // -------------------- FICHAS --------------------
@@ -680,11 +713,13 @@ function abrirModalFicha(ficha = null) {
     <div class="form-group"><label>ID Ficha</label><input id="fichaId" type="number" value="${idValue}" ${isEdit ? 'readonly' : ''}></div>
     <div class="form-group"><label>Programa</label>
       <select id="fichaPrograma">
+        <option value="">Seleccionar</option>
         ${programas.map(p => `<option value="${p.id_programa_titul}" ${isEdit && ficha.id_programa_titul === p.id_programa_titul ? 'selected' : ''}>${escapeHTML(p.nom_programa_titul)}</option>`).join('')}
       </select>
     </div>
     <div class="form-group"><label>Jornada</label>
       <select id="fichaJornada">
+        <option value="">Seleccionar</option>
         <option ${isEdit && ficha.ind_jornada == 'M' ? 'selected' : ''} value="M">Mañana</option>
         <option ${isEdit && ficha.ind_jornada == 'T' ? 'selected' : ''} value="T">Tarde</option>
         <option ${isEdit && ficha.ind_jornada == 'N' ? 'selected' : ''} value="N">Noche</option>
@@ -692,12 +727,14 @@ function abrirModalFicha(ficha = null) {
     </div>
     <div class="form-group"><label>Instructor Líder</label>
       <select id="fichaLider">
+        <option value="">Seleccionar</option>
         ${instructores.map(i => `<option value="${i.id_instruc}" ${isEdit && ficha.id_instruc_lider === i.id_instruc ? 'selected' : ''}>${escapeHTML(i.nom_instruc)} ${escapeHTML(i.apelli_instruc)}</option>`)}
         <option value="">Sin líder</option>
       </select>
     </div>
     <div class="form-group"><label>Ambiente</label>
       <select id="fichaAmbiente">
+        <option value="">Seleccionar</option>
         ${ambientes.map(a => `<option value="${a.id_ambiente}" ${isEdit && ficha.id_ambiente === a.id_ambiente ? 'selected' : ''}>${escapeHTML(a.nom_ambiente)}</option>`).join('')}
       </select>
     </div>

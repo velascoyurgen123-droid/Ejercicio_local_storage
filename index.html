@@ -111,18 +111,18 @@
 
   <!-- SECCIÓN ASIGNACIONES Instr × Competencias -->
   <div id="asignaciones" class="tab-content">
-    <div style="margin-bottom: 1.5rem; background: white; padding: 1.2rem; border-radius: 1rem;">
+    <div class="assignment-form">
       <h3><i class="fas fa-handshake"></i> Asignar instructor a competencia</h3>
-      <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
-        <div class="form-group" style="flex:1">
+      <div class="assignment-fields">
+        <div class="form-group assignment-field">
           <label>Instructor</label>
-          <select id="asignInstrucSelect" class="form-control"></select>
+          <select id="asignInstrucSelect" class="form-control"><option value="">Seleccionar</option></select>
         </div>
-        <div class="form-group" style="flex:1">
+        <div class="form-group assignment-field">
           <label>Competencia</label>
-          <select id="asignCompetSelect" class="form-control"></select>
+          <select id="asignCompetSelect" class="form-control"><option value="">Seleccionar</option></select>
         </div>
-        <div><button class="btn-primary" id="btnAsignar"><i class="fas fa-save"></i> Asignar</button></div>
+        <div class="assignment-action"><button class="btn-primary" id="btnAsignar"><i class="fas fa-save"></i> Asignar</button></div>
       </div>
     </div>
     <div class="table-wrapper">
@@ -139,7 +139,7 @@
       <h2><i class="fas fa-folder-open"></i> Rutas formativas</h2>
       <button class="btn-primary" id="btnAddFicha"><i class="fas fa-plus"></i> Crear ruta</button>
     </div>
-    <div class="route-filters"><i class="fas fa-search"></i><input id="fichaSearch" placeholder="Buscar ficha, programa o instructor..."><select id="fichaStatusFilter"><option value="">Todos los estados</option><option>Activa</option><option>Próxima</option><option>Finalizada</option></select></div>
+    <div class="route-filters"><i class="fas fa-search"></i><input id="fichaSearch" placeholder="Buscar ficha, programa o instructor..."><select id="fichaStatusFilter"><option value="">Seleccionar</option><option>Activa</option><option>Próxima</option><option>Finalizada</option></select></div>
     <div class="table-wrapper">
       <table>
         <thead><tr><th># Ficha</th><th>Programa</th><th>Jornada</th><th>Instructor Líder</th><th>Estado</th><th>Cupos</th><th>Progreso</th><th>Acciones</th></tr></thead>

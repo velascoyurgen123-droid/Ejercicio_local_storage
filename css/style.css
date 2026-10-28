@@ -329,6 +329,19 @@
       border-radius: 0.7rem;
       font-size: 0.9rem;
     }
+    .assignment-form {
+      margin-bottom: 1.5rem;
+      padding: 1.2rem;
+      border-radius: 1rem;
+      background: #ffffff;
+      border: 1px solid rgba(157, 192, 186, 0.35);
+      border-top: 4px solid #1d4ed8;
+      box-shadow: 0 12px 28px rgba(23, 71, 67, 0.07);
+    }
+    .assignment-form h3 { margin-bottom: 1rem; color: #28504d; }
+    .assignment-fields { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+    .assignment-field { flex: 1 1 260px; margin-bottom: 0; }
+    .assignment-action { padding-bottom: 1rem; }
     .flex-buttons {
       display: flex;
       justify-content: flex-end;
@@ -370,8 +383,11 @@
     body[class*="theme-"] .tab-btn:hover { background: var(--theme-soft); color: var(--theme-dark); }
     body[class*="theme-"] .badge { background: var(--theme-soft); color: var(--theme-dark); }
     body[class*="theme-"] .table-wrapper { border-top: 4px solid var(--theme-main); }
+    body[class*="theme-"] .assignment-form { border-top-color: var(--theme-main); }
     body.dark-mode { background: linear-gradient(rgba(4, 15, 31, .86), rgba(4, 15, 31, .9)), url('../assets/campus-bg.png') center / cover fixed no-repeat; }
     body.dark-mode .nav-tabs, body.dark-mode .table-wrapper, body.dark-mode .dashboard-panel, body.dark-mode .stat-card, body.dark-mode .login-card { background: #162238; color: #e5edf7; }
+    body.dark-mode .assignment-form { background: #162238; color: #e5edf7; }
+    body.dark-mode .assignment-form h3 { color: #e5edf7; }
     body.dark-mode .nav-tabs { border-color: #31435d; }
     body.dark-mode .tab-btn, body.dark-mode .dashboard-panel h3, body.dark-mode .stat-card strong { color: #e5edf7; }
     body.dark-mode th { background: #20314b; color: #d8e5f5; }
